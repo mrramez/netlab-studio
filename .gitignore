@@ -1,0 +1,40 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.flattened-pom.xml
+.mvn/timing.properties
+# The "only-script" Maven Wrapper downloads Maven itself; no wrapper jar is ever committed.
+.mvn/wrapper/maven-wrapper.jar
+
+# Java
+*.class
+*.log
+*.hprof
+hs_err_pid*
+replay_pid*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Course material (lecture slides, lab manuals, textbooks) is copyrighted and must never be
+# committed — see CLAUDE.md, hard rule 2. Force-add a file only if it is original work.
+*.pdf
+*.ppt
+*.pptx
+*.doc
+*.docx
