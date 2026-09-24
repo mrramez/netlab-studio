@@ -1,5 +1,6 @@
 package io.github.mrramez.netlabstudio.app;
 
+import io.github.mrramez.netlabstudio.ui.BundledFonts;
 import io.github.mrramez.netlabstudio.ui.I18n;
 import io.github.mrramez.netlabstudio.ui.Language;
 import io.github.mrramez.netlabstudio.ui.MainWindow;
@@ -17,6 +18,7 @@ public final class NetLabStudioApp extends Application {
 
   @Override
   public void start(Stage stage) {
+    BundledFonts.loadAll();
     I18n i18n = new I18n(Language.forLocale(Locale.getDefault()));
     ThemeManager themes = new ThemeManager(Theme.LIGHT);
     new MainWindow(i18n, themes).show(stage);

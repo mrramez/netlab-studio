@@ -2,6 +2,7 @@ package io.github.mrramez.netlabstudio.ui;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import javafx.beans.property.ObjectProperty;
@@ -16,9 +17,12 @@ import javafx.scene.layout.HBox;
  * A row of mutually exclusive toggle buttons bound to a property. Selecting a button sets the
  * property, and changing the property selects the matching button.
  *
+ * <p>Each button has the style class {@code option-<constant name in lower case>}, for example
+ * {@code option-arabic}, so CSS can style an individual option.
+ *
  * @param <T> the type of the options
  */
-final class SegmentedToggle<T> extends HBox {
+final class SegmentedToggle<T extends Enum<T>> extends HBox {
 
   private final ToggleGroup group = new ToggleGroup();
   private final Map<Toggle, T> options = new HashMap<>();
@@ -31,6 +35,7 @@ final class SegmentedToggle<T> extends HBox {
     getStyleClass().add("segmented");
     for (T value : values) {
       ToggleButton button = new ToggleButton();
+      button.getStyleClass().add("option-" + value.name().toLowerCase(Locale.ROOT));
       button.textProperty().bind(label.apply(value));
       Tooltip buttonTooltip = new Tooltip();
       buttonTooltip.textProperty().bind(tooltip);

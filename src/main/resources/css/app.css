@@ -4,8 +4,28 @@
  */
 
 .root {
+  -fx-font-family: "Noto Sans";
   -fx-font-size: 14px; /* SPEC §9: no text smaller than 14 px */
   -fx-background-color: -nl-bg;
+}
+
+/*
+ * The :arabic pseudo-class is set while Arabic is selected. Noto Sans Arabic UI has no Latin
+ * letters, and JavaFX CSS has no font fallback list, so English terms inside Arabic sentences are
+ * drawn in JavaFX's system fallback font.
+ */
+.root:arabic {
+  -fx-font-family: "Noto Sans Arabic UI";
+}
+
+/* Text that is always in one script keeps that script's font whichever language is selected. */
+.root:arabic .app-name,
+.segmented .option-english {
+  -fx-font-family: "Noto Sans";
+}
+
+.segmented .option-arabic {
+  -fx-font-family: "Noto Sans Arabic UI";
 }
 
 .label {
