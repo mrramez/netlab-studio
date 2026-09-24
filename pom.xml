@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.github.mrramez.netlabstudio</groupId>
+  <artifactId>netlab-studio</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>NetLab Studio</name>
+  <description>
+    Desktop app that teaches computer-networking fundamentals with interactive lessons, a network
+    simulator, a subnetting trainer and a simplified Cisco IOS CLI, in English and Arabic.
+  </description>
+  <url>https://github.com/mrramez/netlab-studio</url>
+  <inceptionYear>2026</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/license/mit</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>mrramez</id>
+      <name>Ramez Al-Maqtari</name>
+      <url>https://github.com/mrramez</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/mrramez/netlab-studio.git</connection>
+    <developerConnection>scm:git:https://github.com/mrramez/netlab-studio.git</developerConnection>
+    <url>https://github.com/mrramez/netlab-studio</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/mrramez/netlab-studio/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>GitHub Actions</system>
+    <url>https://github.com/mrramez/netlab-studio/actions</url>
+  </ciManagement>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- A fixed timestamp makes the jar byte-for-byte reproducible. -->
+    <project.build.outputTimestamp>2026-09-24T00:00:00Z</project.build.outputTimestamp>
+
+    <app.module>io.github.mrramez.netlabstudio</app.module>
+    <app.mainClass>io.github.mrramez.netlabstudio.app.Main</app.mainClass>
+
+    <!-- Quality gate: minimum line coverage of each logic package (core.net, core.sim, core.cli). -->
+    <coverage.line.minimum>0.80</coverage.line.minimum>
+
+    <!-- Dependencies (every version pinned; Dependabot proposes updates). -->
+    <javafx.version>21.0.12</javafx.version>
+    <junit.version>5.14.4</junit.version>
+    <assertj.version>3.27.7</assertj.version>
+    <archunit.version>1.5.0</archunit.version>
+
+    <!-- Plugins -->
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+    <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+    <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+    <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
+    <maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
+    <maven-site-plugin.version>3.22.0</maven-site-plugin.version>
+    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <maven-wrapper-plugin.version>3.3.4</maven-wrapper-plugin.version>
+    <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
+    <spotless-maven-plugin.version>3.10.2</spotless-maven-plugin.version>
+    <google-java-format.version>1.36.1</google-java-format.version>
+    <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+    <cyclonedx-maven-plugin.version>2.9.3</cyclonedx-maven-plugin.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${maven-clean-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${maven-deploy-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-wrapper-plugin</artifactId>
+          <version>${maven-wrapper-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-maven-plugin</artifactId>
+          <version>${javafx-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.cyclonedx</groupId>
+          <artifactId>cyclonedx-maven-plugin</artifactId>
+          <version>${cyclonedx-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-build-rules</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.9.0,)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[21,)</version>
+                </requireJavaVersion>
+                <requirePluginVersions>
+                  <message>Pin every plugin version (reproducible builds, supply-chain hygiene).</message>
+                </requirePluginVersions>
+                <banDuplicatePomDependencyVersions/>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <!-- Never run annotation processors that happen to be on the class path. -->
+          <proc>none</proc>
+          <showWarnings>true</showWarnings>
+          <compilerArgs>
+            <arg>-Xlint:all</arg>
+            <arg>-Werror</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Tests run on the class path: ArchUnit scans packages there, and no test relies on
+               module encapsulation. The module descriptor is still checked by every compile. -->
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <configuration>
+          <java>
+            <toggleOffOn/>
+            <googleJavaFormat>
+              <version>${google-java-format.version}</version>
+              <style>GOOGLE</style>
+            </googleJavaFormat>
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <id>check-formatting</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check-coverage</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- Checked per package, so one well-tested package cannot hide an untested one.
+                     Packages that have no classes yet have nothing to measure and pass. -->
+                <rule>
+                  <element>PACKAGE</element>
+                  <includes>
+                    <include>io.github.mrramez.netlabstudio.core.net</include>
+                    <include>io.github.mrramez.netlabstudio.core.net.*</include>
+                    <include>io.github.mrramez.netlabstudio.core.sim</include>
+                    <include>io.github.mrramez.netlabstudio.core.sim.*</include>
+                    <include>io.github.mrramez.netlabstudio.core.cli</include>
+                    <include>io.github.mrramez.netlabstudio.core.cli.*</include>
+                  </includes>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>${coverage.line.minimum}</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sbom</id>
+            <phase>package</phase>
+            <goals>
+              <goal>makeBom</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <projectType>application</projectType>
+          <includeTestScope>false</includeTestScope>
+          <outputFormat>json</outputFormat>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>${app.module}/${app.mainClass}</mainClass>
+          <options>
+            <!-- JavaFX loads its native libraries through JNI; granting that explicitly keeps
+                 JDK 24+ from printing restricted-method warnings (the flag is accepted by JDK 21). -->
+            <option>--enable-native-access=javafx.graphics</option>
+          </options>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
