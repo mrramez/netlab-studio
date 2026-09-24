@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+      include: scope
+    ignore:
+      # The spec targets the JavaFX 21 LTS line: accept 21.0.x updates only.
+      - dependency-name: org.openjfx:javafx-controls
+        update-types: [version-update:semver-major]
+      - dependency-name: org.openjfx:javafx-fxml
+        update-types: [version-update:semver-major]
+      # The spec targets JUnit 5. Moving to JUnit 6 is a deliberate decision, not a routine bump.
+      - dependency-name: org.junit:junit-bom
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+      include: scope
