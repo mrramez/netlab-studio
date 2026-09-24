@@ -1,0 +1,20 @@
+# Normalise line endings: LF for sources, scripts and resources on every OS…
+* text=auto eol=lf
+
+# …except Windows command scripts, which cmd.exe expects with CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets: never convert line endings or diff them as text.
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.jar binary
+*.zip binary
