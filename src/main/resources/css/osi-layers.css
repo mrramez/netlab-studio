@@ -1,0 +1,14 @@
+/*
+ * OSI layer colours: the single definition for the whole app (CLAUDE.md, rule 7).
+ * Both themes import this file. Use these variables in lessons, the PDU inspector and animations,
+ * and never repeat the hex values anywhere else.
+ */
+.root {
+  -osi-l7-application: #8E44AD;
+  -osi-l6-presentation: #9B59B6;
+  -osi-l5-session: #3498DB;
+  -osi-l4-transport: #2E86C1;
+  -osi-l3-network: #27AE60;
+  -osi-l2-data-link: #F39C12;
+  -osi-l1-physical: #E74C3C;
+}

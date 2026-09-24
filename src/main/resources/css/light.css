@@ -1,0 +1,28 @@
+@import "osi-layers.css";
+
+/*
+ * Light theme: colour variables only. The component styles in app.css use them, so both themes
+ * must define exactly the same variables (ThemeStylesheetsTest checks this).
+ * Text colours meet WCAG AA contrast (at least 4.5:1) on the backgrounds they are used on.
+ */
+.root {
+  -nl-bg: #f4f6f9;
+  -nl-surface: #ffffff;
+  -nl-surface-hover: #eef2f7;
+  -nl-border: #d3dae3;
+  -nl-text: #16202c;
+  -nl-text-muted: #4f5d6d;
+  -nl-accent: #1f6fb2;
+  -nl-on-accent: #ffffff;
+  -nl-badge-bg: #e7edf5;
+  -nl-badge-text: #2c3e50;
+  -nl-shadow: rgba(22, 32, 44, 0.08);
+
+  /* Built-in controls (modena) derive their colours from these. */
+  -fx-base: #e9edf2;
+  -fx-background: -nl-bg;
+  -fx-control-inner-background: -nl-surface;
+  -fx-accent: -nl-accent;
+  -fx-focus-color: -nl-accent;
+  -fx-faint-focus-color: #1f6fb222;
+}

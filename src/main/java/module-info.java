@@ -8,4 +8,8 @@
 module io.github.mrramez.netlabstudio {
   requires javafx.controls;
   requires javafx.fxml;
+
+  // JavaFX creates the Application subclass reflectively, so its package must be readable.
+  exports io.github.mrramez.netlabstudio.app to
+      javafx.graphics;
 }
