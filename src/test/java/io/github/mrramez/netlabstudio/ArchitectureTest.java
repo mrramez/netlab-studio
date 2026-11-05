@@ -55,6 +55,32 @@ class ArchitectureTest {
         .because("addressing arithmetic is pure Java and must not pull in any other code");
   }
 
+  private static final String CORE_MODEL = ROOT + ".core.model..";
+  private static final String CORE_SIM = ROOT + ".core.sim..";
+
+  /**
+   * Classes in {@code packageName} may depend only on the JDK and on other {@code core} packages.
+   */
+  static ArchRule onlyJdkAndCore(String packageName) {
+    return classes()
+        .that()
+        .resideInAPackage(packageName)
+        .should()
+        .onlyDependOnClassesThat()
+        .resideInAnyPackage("java..", CORE)
+        .because("model and simulation are plain Java: no JavaFX, no ui, no app");
+  }
+
+  // The model describes a network; the simulator runs it. Not the other way round.
+  static final ArchRule MODEL_DOES_NOT_DEPEND_ON_SIM =
+      noClasses()
+          .that()
+          .resideInAPackage(CORE_MODEL)
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage(CORE_SIM)
+          .because("the simulator depends on the model, never the reverse");
+
   private static final JavaClasses PRODUCTION_CLASSES =
       new ClassFileImporter()
           .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
@@ -62,6 +88,9 @@ class ArchitectureTest {
 
   private static final JavaClasses VIOLATING_FIXTURE =
       new ClassFileImporter().importPackages(ROOT + ".core.archfixture");
+
+  private static final JavaClasses MODEL_VIOLATING_FIXTURE =
+      new ClassFileImporter().importPackages(ROOT + ".core.model.archfixture");
 
   @Test
   void coreDoesNotUseJavaFx() {
@@ -104,6 +133,40 @@ class ArchitectureTest {
   void jdkOnlyRuleRejectsAViolation() {
     assertThat(
             onlyJdkAndItself(ROOT + ".core.archfixture").evaluate(VIOLATING_FIXTURE).hasViolation())
+        .isTrue();
+  }
+
+  @Test
+  void coreModelDependsOnlyOnTheJdkAndCore() {
+    onlyJdkAndCore(CORE_MODEL).check(PRODUCTION_CLASSES);
+  }
+
+  @Test
+  void coreSimDependsOnlyOnTheJdkAndCore() {
+    onlyJdkAndCore(CORE_SIM).check(PRODUCTION_CLASSES);
+  }
+
+  @Test
+  void coreModelDoesNotDependOnCoreSim() {
+    MODEL_DOES_NOT_DEPEND_ON_SIM.check(PRODUCTION_CLASSES);
+  }
+
+  @Test
+  void coreModelAndSimAreActuallyScanned() {
+    assertThat(PRODUCTION_CLASSES.that(resideInAPackage(CORE_MODEL))).isNotEmpty();
+    assertThat(PRODUCTION_CLASSES.that(resideInAPackage(CORE_SIM))).isNotEmpty();
+  }
+
+  @Test
+  void jdkAndCoreRuleRejectsAViolation() {
+    assertThat(
+            onlyJdkAndCore(ROOT + ".core.archfixture").evaluate(VIOLATING_FIXTURE).hasViolation())
+        .isTrue();
+  }
+
+  @Test
+  void modelMustNotDependOnSimRuleRejectsAViolation() {
+    assertThat(MODEL_DOES_NOT_DEPEND_ON_SIM.evaluate(MODEL_VIOLATING_FIXTURE).hasViolation())
         .isTrue();
   }
 }
