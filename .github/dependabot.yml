@@ -7,6 +7,13 @@ updates:
     commit-message:
       prefix: build
       include: scope
+    groups:
+      # One pull request for all minor and patch updates. Major updates stay separate, so each
+      # one gets its own review.
+      maven-minor-patch:
+        update-types:
+          - minor
+          - patch
     ignore:
       # The spec targets the JavaFX 21 LTS line: accept 21.0.x updates only.
       - dependency-name: org.openjfx:javafx-controls
@@ -24,3 +31,9 @@ updates:
     commit-message:
       prefix: ci
       include: scope
+    groups:
+      # All actions in one pull request, so related actions are never bumped separately. This
+      # matters for github/codeql-action: its init and analyze steps must use the same version.
+      github-actions:
+        patterns:
+          - "*"
