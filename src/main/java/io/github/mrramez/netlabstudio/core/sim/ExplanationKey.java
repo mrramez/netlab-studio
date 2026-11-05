@@ -89,18 +89,13 @@ public enum ExplanationKey {
   ARP_REPLY_RECEIVED("sim.arp.replyReceived"),
   /** An entry was added to the ARP cache. Args: IP, MAC. */
   ARP_CACHE_UPDATED("sim.arp.cacheUpdated"),
-  /**
-   * A host cannot send the packet yet, so it is dropped while ARP resolves; this is why the first
-   * ping is lost. Args: destination IP, next-hop IP.
-   */
-  ARP_FIRST_PACKET_LOST("sim.arp.firstPacketLost"),
-  /** A router holds the packet until ARP finishes. Args: destination IP, next-hop IP. */
+  /** A device holds the packet until ARP finishes. Args: destination IP, next-hop IP. */
   ARP_PACKET_HELD("sim.arp.packetHeld"),
   /** ARP finished and the held packet is sent. Args: destination IP, next-hop IP. */
   ARP_PACKET_RELEASED("sim.arp.packetReleased"),
   /** Nobody answered the ARP request. Args: IP that was asked about. */
   ARP_NO_REPLY("sim.arp.noReply"),
-  /** A router gave up on a held packet because ARP got no answer. Args: destination IP. */
+  /** A device gave up on a held packet because ARP got no answer. Args: destination IP. */
   ARP_HELD_PACKET_DISCARDED("sim.arp.heldPacketDiscarded"),
 
   // ---- hub / repeater ----
@@ -131,6 +126,12 @@ public enum ExplanationKey {
   ROUTER_INTERFACE_NO_IP("sim.router.interfaceNoIp"),
   /** A broadcast is not forwarded: it stays in its broadcast domain. Args: none. */
   ROUTER_BROADCAST_NOT_FORWARDED("sim.router.broadcastNotForwarded"),
+  /**
+   * The router has no ARP entry for the next hop, so (like Cisco IOS) it drops the packet that
+   * triggered the ARP request instead of holding it, and sends the request. This is why the first
+   * ping through a router times out. Args: destination IP, next-hop IP.
+   */
+  ROUTER_ARP_PACKET_DROPPED("sim.router.arpPacketDropped"),
   /** The TTL was decremented. Args: old TTL, new TTL. */
   ROUTER_TTL_DECREMENT("sim.router.ttlDecrement"),
   /** The TTL reached zero and the packet is discarded. Args: source IP, destination IP. */

@@ -23,7 +23,7 @@ class RoutedScenarioTest {
       t=0 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
       t=0 A L3 DECIDE sim.host.destinationRemote
       t=0 A.Fa0 L2 LOOKUP sim.arp.cacheMiss
-      t=0 A.Fa0 L3 DROP sim.arp.firstPacketLost
+      t=0 A.Fa0 L2 QUEUE sim.arp.packetHeld
       t=0 A.Fa0 L2 GENERATE sim.arp.requestSent
       t=0 A.Fa0 L2 TRANSMIT sim.l2.frameSent
       t=1 R1.G0/0 L2 RECEIVE sim.l2.frameReceived
@@ -36,53 +36,60 @@ class RoutedScenarioTest {
       t=2 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
       t=2 A.Fa0 L2 DELIVER sim.arp.replyReceived
       t=2 A.Fa0 L2 CACHE_UPDATE sim.arp.cacheUpdated
-      t=3 A L7 TIMEOUT sim.ping.timeout
-      t=4 A L7 GENERATE sim.ping.start
-      t=4 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
-      t=4 A L3 DECIDE sim.host.destinationRemote
-      t=4 A.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=4 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=4 A.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=5 R1.G0/0 L2 RECEIVE sim.l2.frameReceived
-      t=5 R1.G0/0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=5 R1.G0/0 L3 DECREMENT_TTL sim.router.ttlDecrement
-      t=5 R1.G0/1 L3 LOOKUP sim.router.routeFound
-      t=5 R1.G0/1 L2 LOOKUP sim.arp.cacheMiss
-      t=5 R1.G0/1 L2 QUEUE sim.arp.packetHeld
-      t=5 R1.G0/1 L2 GENERATE sim.arp.requestSent
-      t=5 R1.G0/1 L2 TRANSMIT sim.l2.frameSent
-      t=6 B.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=6 B.Fa0 L2 DECAPSULATE sim.nic.acceptedBroadcast
-      t=6 B.Fa0 L2 DELIVER sim.arp.requestForMe
-      t=6 B.Fa0 L2 CACHE_UPDATE sim.arp.cacheUpdated
-      t=6 B.Fa0 L2 GENERATE sim.arp.replySent
-      t=6 B.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=7 R1.G0/1 L2 RECEIVE sim.l2.frameReceived
-      t=7 R1.G0/1 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=7 R1.G0/1 L2 DELIVER sim.arp.replyReceived
-      t=7 R1.G0/1 L2 CACHE_UPDATE sim.arp.cacheUpdated
-      t=7 R1.G0/1 L2 RELEASE sim.arp.packetReleased
-      t=7 R1.G0/1 L2 REWRITE sim.router.rewriteFrame
-      t=7 R1.G0/1 L2 TRANSMIT sim.l2.frameSent
-      t=8 B.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=8 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=8 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
-      t=8 B L3 GENERATE sim.icmp.echoReplyCreated
-      t=8 B L3 DECIDE sim.host.destinationRemote
-      t=8 B.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=8 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=8 B.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=9 R1.G0/1 L2 RECEIVE sim.l2.frameReceived
-      t=9 R1.G0/1 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=9 R1.G0/1 L3 DECREMENT_TTL sim.router.ttlDecrement
-      t=9 R1.G0/0 L3 LOOKUP sim.router.routeFound
-      t=9 R1.G0/0 L2 LOOKUP sim.arp.cacheHit
-      t=9 R1.G0/0 L2 REWRITE sim.router.rewriteFrame
-      t=9 R1.G0/0 L2 TRANSMIT sim.l2.frameSent
-      t=10 A.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=10 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=10 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
-      t=10 A L7 DELIVER sim.ping.replyReceived
+      t=2 A.Fa0 L2 RELEASE sim.arp.packetReleased
+      t=2 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=2 A.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=3 R1.G0/0 L2 RECEIVE sim.l2.frameReceived
+      t=3 R1.G0/0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=3 R1.G0/0 L3 DECREMENT_TTL sim.router.ttlDecrement
+      t=3 R1.G0/1 L3 LOOKUP sim.router.routeFound
+      t=3 R1.G0/1 L2 LOOKUP sim.arp.cacheMiss
+      t=3 R1.G0/1 L3 DROP sim.router.arpPacketDropped
+      t=3 R1.G0/1 L2 GENERATE sim.arp.requestSent
+      t=3 R1.G0/1 L2 TRANSMIT sim.l2.frameSent
+      t=4 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=4 B.Fa0 L2 DECAPSULATE sim.nic.acceptedBroadcast
+      t=4 B.Fa0 L2 DELIVER sim.arp.requestForMe
+      t=4 B.Fa0 L2 CACHE_UPDATE sim.arp.cacheUpdated
+      t=4 B.Fa0 L2 GENERATE sim.arp.replySent
+      t=4 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=5 R1.G0/1 L2 RECEIVE sim.l2.frameReceived
+      t=5 R1.G0/1 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=5 R1.G0/1 L2 DELIVER sim.arp.replyReceived
+      t=5 R1.G0/1 L2 CACHE_UPDATE sim.arp.cacheUpdated
+      t=6 A L7 TIMEOUT sim.ping.timeout
+      t=7 A L7 GENERATE sim.ping.start
+      t=7 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
+      t=7 A L3 DECIDE sim.host.destinationRemote
+      t=7 A.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=7 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=7 A.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=8 R1.G0/0 L2 RECEIVE sim.l2.frameReceived
+      t=8 R1.G0/0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=8 R1.G0/0 L3 DECREMENT_TTL sim.router.ttlDecrement
+      t=8 R1.G0/1 L3 LOOKUP sim.router.routeFound
+      t=8 R1.G0/1 L2 LOOKUP sim.arp.cacheHit
+      t=8 R1.G0/1 L2 REWRITE sim.router.rewriteFrame
+      t=8 R1.G0/1 L2 TRANSMIT sim.l2.frameSent
+      t=9 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=9 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=9 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
+      t=9 B L3 GENERATE sim.icmp.echoReplyCreated
+      t=9 B L3 DECIDE sim.host.destinationRemote
+      t=9 B.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=9 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=9 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=10 R1.G0/1 L2 RECEIVE sim.l2.frameReceived
+      t=10 R1.G0/1 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=10 R1.G0/1 L3 DECREMENT_TTL sim.router.ttlDecrement
+      t=10 R1.G0/0 L3 LOOKUP sim.router.routeFound
+      t=10 R1.G0/0 L2 LOOKUP sim.arp.cacheHit
+      t=10 R1.G0/0 L2 REWRITE sim.router.rewriteFrame
+      t=10 R1.G0/0 L2 TRANSMIT sim.l2.frameSent
+      t=11 A.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=11 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=11 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
+      t=11 A L7 DELIVER sim.ping.replyReceived
       """;
 
   private final Topology topology = new Topology();
@@ -112,15 +119,28 @@ class RoutedScenarioTest {
   }
 
   @Test
-  void theCrossNetworkPingSucceedsOnceArpIsDoneOnBothLans() {
+  void theFirstPingIsLostBecauseTheRouterDropsThePacketThatTriggeredItsArp() {
     PingAttempt first = result.attempts().get(0);
     PingAttempt second = result.attempts().get(1);
 
+    assertThat(first.success()).isFalse();
     assertThat(first.reason()).contains(FailureReason.LOST_TO_ARP);
+    // The cause is found at the router, not at the PC: the PC held its packet and sent it.
+    assertThat(first.failedAtDeviceId()).isEqualTo(r1.id());
+    SimEvent dropped =
+        result.events().stream()
+            .filter(e -> e.explanationKey().equals("sim.router.arpPacketDropped"))
+            .findFirst()
+            .orElseThrow();
+    assertThat(dropped.deviceId()).isEqualTo(r1.id());
+    assertThat(dropped.portName()).isEqualTo("G0/1");
+    assertThat(dropped.action()).isEqualTo(SimAction.DROP);
+    assertThat(dropped.args()).containsExactly("192.168.2.10", "192.168.2.10");
+
     assertThat(second.success()).isTrue();
     assertThat(second.repliedFrom()).isEqualTo(Lab.ip("192.168.2.10"));
-    // A - R1 - B and back: 4 cables, plus 2 for the ARP exchange the router needs on the way.
-    assertThat(second.roundTripTicks()).isEqualTo(6);
+    // Both ARP caches are warm now: A - R1 - B and back is four cables.
+    assertThat(second.roundTripTicks()).isEqualTo(4);
   }
 
   @Test
@@ -274,13 +294,15 @@ class RoutedScenarioTest {
     assertThat(far.reachable()).isFalse();
   }
 
+  /** The frames that carried the second echo request: the first one never got past the router. */
   private List<SimEvent> echoRequestFrames() {
     return result.events().stream()
         .filter(e -> e.action() == SimAction.TRANSMIT)
         .filter(
             e ->
                 e.frame().orElseThrow().payload() instanceof Ipv4Packet packet
-                    && ((IcmpMessage) packet.payload()).type() == IcmpType.ECHO_REQUEST)
+                    && ((IcmpMessage) packet.payload()).type() == IcmpType.ECHO_REQUEST
+                    && ((IcmpMessage) packet.payload()).seq() == 2)
         .toList();
   }
 }

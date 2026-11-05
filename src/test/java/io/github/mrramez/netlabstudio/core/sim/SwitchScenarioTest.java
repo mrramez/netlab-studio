@@ -22,7 +22,7 @@ class SwitchScenarioTest {
       t=0 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
       t=0 A L3 DECIDE sim.host.destinationLocal
       t=0 A.Fa0 L2 LOOKUP sim.arp.cacheMiss
-      t=0 A.Fa0 L3 DROP sim.arp.firstPacketLost
+      t=0 A.Fa0 L2 QUEUE sim.arp.packetHeld
       t=0 A.Fa0 L2 GENERATE sim.arp.requestSent
       t=0 A.Fa0 L2 TRANSMIT sim.l2.frameSent
       t=1 SW.Fa0/1 L2 RECEIVE sim.l2.frameReceived
@@ -47,33 +47,55 @@ class SwitchScenarioTest {
       t=4 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
       t=4 A.Fa0 L2 DELIVER sim.arp.replyReceived
       t=4 A.Fa0 L2 CACHE_UPDATE sim.arp.cacheUpdated
-      t=5 A L7 TIMEOUT sim.ping.timeout
-      t=6 A L7 GENERATE sim.ping.start
-      t=6 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
-      t=6 A L3 DECIDE sim.host.destinationLocal
-      t=6 A.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=6 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=6 A.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=7 SW.Fa0/1 L2 RECEIVE sim.l2.frameReceived
-      t=7 SW.Fa0/1 L2 LEARN sim.switch.learnKnown
-      t=7 SW.Fa0/1 L2 FORWARD sim.switch.forwardKnown
-      t=7 SW.Fa0/2 L2 TRANSMIT sim.l2.frameSent
-      t=8 B.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=8 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=8 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
-      t=8 B L3 GENERATE sim.icmp.echoReplyCreated
-      t=8 B L3 DECIDE sim.host.destinationLocal
-      t=8 B.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=8 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=8 B.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=9 SW.Fa0/2 L2 RECEIVE sim.l2.frameReceived
-      t=9 SW.Fa0/2 L2 LEARN sim.switch.learnKnown
-      t=9 SW.Fa0/2 L2 FORWARD sim.switch.forwardKnown
-      t=9 SW.Fa0/1 L2 TRANSMIT sim.l2.frameSent
-      t=10 A.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=10 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=10 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
-      t=10 A L7 DELIVER sim.ping.replyReceived
+      t=4 A.Fa0 L2 RELEASE sim.arp.packetReleased
+      t=4 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=4 A.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=5 SW.Fa0/1 L2 RECEIVE sim.l2.frameReceived
+      t=5 SW.Fa0/1 L2 LEARN sim.switch.learnKnown
+      t=5 SW.Fa0/1 L2 FORWARD sim.switch.forwardKnown
+      t=5 SW.Fa0/2 L2 TRANSMIT sim.l2.frameSent
+      t=6 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=6 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=6 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
+      t=6 B L3 GENERATE sim.icmp.echoReplyCreated
+      t=6 B L3 DECIDE sim.host.destinationLocal
+      t=6 B.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=6 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=6 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=7 SW.Fa0/2 L2 RECEIVE sim.l2.frameReceived
+      t=7 SW.Fa0/2 L2 LEARN sim.switch.learnKnown
+      t=7 SW.Fa0/2 L2 FORWARD sim.switch.forwardKnown
+      t=7 SW.Fa0/1 L2 TRANSMIT sim.l2.frameSent
+      t=8 A.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=8 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=8 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
+      t=8 A L7 DELIVER sim.ping.replyReceived
+      t=9 A L7 GENERATE sim.ping.start
+      t=9 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
+      t=9 A L3 DECIDE sim.host.destinationLocal
+      t=9 A.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=9 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=9 A.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=10 SW.Fa0/1 L2 RECEIVE sim.l2.frameReceived
+      t=10 SW.Fa0/1 L2 LEARN sim.switch.learnKnown
+      t=10 SW.Fa0/1 L2 FORWARD sim.switch.forwardKnown
+      t=10 SW.Fa0/2 L2 TRANSMIT sim.l2.frameSent
+      t=11 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=11 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=11 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
+      t=11 B L3 GENERATE sim.icmp.echoReplyCreated
+      t=11 B L3 DECIDE sim.host.destinationLocal
+      t=11 B.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=11 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=11 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=12 SW.Fa0/2 L2 RECEIVE sim.l2.frameReceived
+      t=12 SW.Fa0/2 L2 LEARN sim.switch.learnKnown
+      t=12 SW.Fa0/2 L2 FORWARD sim.switch.forwardKnown
+      t=12 SW.Fa0/1 L2 TRANSMIT sim.l2.frameSent
+      t=13 A.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=13 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=13 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
+      t=13 A L7 DELIVER sim.ping.replyReceived
       """;
 
   private final Topology topology = new Topology();
@@ -94,7 +116,7 @@ class SwitchScenarioTest {
     Lab.cable(topology, b, "Fa0", sw, "Fa0/2");
     Lab.cable(topology, c, "Fa0", sw, "Fa0/3");
     engine = new SimulationEngine(topology);
-    // Two echo requests: the first is lost while ARP resolves, the second goes through.
+    // A holds the first echo request while ARP resolves, so both requests are answered.
     result = engine.ping(a.id(), Lab.ip("192.168.1.20"), 2);
   }
 
@@ -104,23 +126,26 @@ class SwitchScenarioTest {
   }
 
   @Test
-  void theFirstPingIsLostToArpAndTheSecondSucceeds() {
+  void bothPingsAreAnsweredBecauseTheHostHoldsTheFirstPacketDuringArp() {
     assertThat(result.sent()).isEqualTo(2);
-    assertThat(result.received()).isEqualTo(1);
-    assertThat(result.lost()).isEqualTo(1);
-    assertThat(result.reachable()).isTrue();
-    assertThat(result.allReceived()).isFalse();
+    assertThat(result.received()).isEqualTo(2);
+    assertThat(result.lost()).isZero();
+    assertThat(result.allReceived()).isTrue();
 
     PingAttempt first = result.attempts().get(0);
-    assertThat(first.success()).isFalse();
-    assertThat(first.reason()).contains(FailureReason.LOST_TO_ARP);
-    assertThat(first.failedAtDeviceId()).isEqualTo(a.id());
+    assertThat(first.success()).isTrue();
+    assertThat(first.repliedFrom()).isEqualTo(Lab.ip("192.168.1.20"));
+    // ARP exchange (4 cables) and then the echo itself (4 cables).
+    assertThat(first.roundTripTicks()).isEqualTo(8);
 
     PingAttempt second = result.attempts().get(1);
     assertThat(second.success()).isTrue();
-    assertThat(second.repliedFrom()).isEqualTo(Lab.ip("192.168.1.20"));
     // A to switch, switch to B, B to switch, switch to A: four cables, one tick each.
     assertThat(second.roundTripTicks()).isEqualTo(4);
+    assertThat(result.events())
+        .extracting(SimEvent::explanationKey)
+        .contains("sim.arp.packetHeld", "sim.arp.packetReleased")
+        .doesNotContain("sim.router.arpPacketDropped");
   }
 
   @Test
@@ -238,13 +263,15 @@ class SwitchScenarioTest {
         .toList();
   }
 
+  /** The frames carrying the first (seq 1) echo request or reply. */
   private List<SimEvent> echoTransmissions(IcmpType type) {
     return result.events().stream()
         .filter(e -> e.action().isTransmission())
         .filter(
             e ->
                 e.frame().orElseThrow().payload() instanceof Ipv4Packet packet
-                    && ((IcmpMessage) packet.payload()).type() == type)
+                    && ((IcmpMessage) packet.payload()).type() == type
+                    && ((IcmpMessage) packet.payload()).seq() == 1)
         .toList();
   }
 

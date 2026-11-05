@@ -18,7 +18,10 @@ public enum FailureReason {
   NO_ROUTE,
   /** The TTL ran out on the way. */
   TTL_EXPIRED,
-  /** The sender dropped the packet while ARP was still resolving the next hop's MAC address. */
+  /**
+   * A router dropped the packet that triggered its ARP request (Cisco IOS behaviour), so this ping
+   * timed out although the path works; the next one succeeds.
+   */
   LOST_TO_ARP,
   /** Nobody answered the ARP request: the next hop is not there. */
   HOST_UNREACHABLE,

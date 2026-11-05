@@ -20,7 +20,7 @@ class HubScenarioTest {
       t=0 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
       t=0 A L3 DECIDE sim.host.destinationLocal
       t=0 A.Fa0 L2 LOOKUP sim.arp.cacheMiss
-      t=0 A.Fa0 L3 DROP sim.arp.firstPacketLost
+      t=0 A.Fa0 L2 QUEUE sim.arp.packetHeld
       t=0 A.Fa0 L2 GENERATE sim.arp.requestSent
       t=0 A.Fa0 L2 TRANSMIT sim.l2.frameSent
       t=1 HUB.Port1 L1 RECEIVE sim.l1.signalReceived
@@ -42,37 +42,61 @@ class HubScenarioTest {
       t=4 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
       t=4 A.Fa0 L2 DELIVER sim.arp.replyReceived
       t=4 A.Fa0 L2 CACHE_UPDATE sim.arp.cacheUpdated
+      t=4 A.Fa0 L2 RELEASE sim.arp.packetReleased
+      t=4 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=4 A.Fa0 L2 TRANSMIT sim.l2.frameSent
       t=4 C.Fa0 L2 RECEIVE sim.l2.frameReceived
       t=4 C.Fa0 L2 DROP sim.nic.frameNotForMe
-      t=5 A L7 TIMEOUT sim.ping.timeout
-      t=6 A L7 GENERATE sim.ping.start
-      t=6 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
-      t=6 A L3 DECIDE sim.host.destinationLocal
-      t=6 A.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=6 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=6 A.Fa0 L2 TRANSMIT sim.l2.frameSent
-      t=7 HUB.Port1 L1 RECEIVE sim.l1.signalReceived
-      t=7 HUB.Port2 L1 REPEAT sim.hub.repeat
+      t=5 HUB.Port1 L1 RECEIVE sim.l1.signalReceived
+      t=5 HUB.Port2 L1 REPEAT sim.hub.repeat
+      t=5 HUB.Port3 L1 REPEAT sim.hub.repeat
+      t=6 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=6 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=6 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
+      t=6 B L3 GENERATE sim.icmp.echoReplyCreated
+      t=6 B L3 DECIDE sim.host.destinationLocal
+      t=6 B.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=6 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=6 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=6 C.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=6 C.Fa0 L2 DROP sim.nic.frameNotForMe
+      t=7 HUB.Port2 L1 RECEIVE sim.l1.signalReceived
+      t=7 HUB.Port1 L1 REPEAT sim.hub.repeat
       t=7 HUB.Port3 L1 REPEAT sim.hub.repeat
-      t=8 B.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=8 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=8 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
-      t=8 B L3 GENERATE sim.icmp.echoReplyCreated
-      t=8 B L3 DECIDE sim.host.destinationLocal
-      t=8 B.Fa0 L2 LOOKUP sim.arp.cacheHit
-      t=8 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
-      t=8 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=8 A.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=8 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=8 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
       t=8 C.Fa0 L2 RECEIVE sim.l2.frameReceived
       t=8 C.Fa0 L2 DROP sim.nic.frameNotForMe
-      t=9 HUB.Port2 L1 RECEIVE sim.l1.signalReceived
-      t=9 HUB.Port1 L1 REPEAT sim.hub.repeat
-      t=9 HUB.Port3 L1 REPEAT sim.hub.repeat
-      t=10 A.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=10 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
-      t=10 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
-      t=10 C.Fa0 L2 RECEIVE sim.l2.frameReceived
-      t=10 C.Fa0 L2 DROP sim.nic.frameNotForMe
-      t=10 A L7 DELIVER sim.ping.replyReceived
+      t=8 A L7 DELIVER sim.ping.replyReceived
+      t=9 A L7 GENERATE sim.ping.start
+      t=9 A L3 ENCAPSULATE sim.icmp.echoRequestCreated
+      t=9 A L3 DECIDE sim.host.destinationLocal
+      t=9 A.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=9 A.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=9 A.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=10 HUB.Port1 L1 RECEIVE sim.l1.signalReceived
+      t=10 HUB.Port2 L1 REPEAT sim.hub.repeat
+      t=10 HUB.Port3 L1 REPEAT sim.hub.repeat
+      t=11 B.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=11 B.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=11 B.Fa0 L3 DELIVER sim.icmp.echoRequestReceived
+      t=11 B L3 GENERATE sim.icmp.echoReplyCreated
+      t=11 B L3 DECIDE sim.host.destinationLocal
+      t=11 B.Fa0 L2 LOOKUP sim.arp.cacheHit
+      t=11 B.Fa0 L2 ENCAPSULATE sim.l2.encapsulated
+      t=11 B.Fa0 L2 TRANSMIT sim.l2.frameSent
+      t=11 C.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=11 C.Fa0 L2 DROP sim.nic.frameNotForMe
+      t=12 HUB.Port2 L1 RECEIVE sim.l1.signalReceived
+      t=12 HUB.Port1 L1 REPEAT sim.hub.repeat
+      t=12 HUB.Port3 L1 REPEAT sim.hub.repeat
+      t=13 A.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=13 A.Fa0 L2 DECAPSULATE sim.nic.acceptedUnicast
+      t=13 A.Fa0 L3 DELIVER sim.icmp.echoReplyReceived
+      t=13 C.Fa0 L2 RECEIVE sim.l2.frameReceived
+      t=13 C.Fa0 L2 DROP sim.nic.frameNotForMe
+      t=13 A L7 DELIVER sim.ping.replyReceived
       """;
 
   private final Topology topology = new Topology();
@@ -101,9 +125,10 @@ class HubScenarioTest {
   }
 
   @Test
-  void pingStillWorksButOnlyAfterTheFirstPacketWasLost() {
-    assertThat(result.attempts().get(0).reason()).contains(FailureReason.LOST_TO_ARP);
-    assertThat(result.attempts().get(1).success()).isTrue();
+  void bothPingsSucceedBecauseTheHostHoldsTheFirstPacketDuringArp() {
+    assertThat(result.allReceived()).isTrue();
+    assertThat(result.attempts().get(0).roundTripTicks()).isEqualTo(8);
+    assertThat(result.attempts().get(1).roundTripTicks()).isEqualTo(4);
   }
 
   @Test
@@ -115,12 +140,12 @@ class HubScenarioTest {
             .filter(e -> e.action() == SimAction.REPEAT)
             .collect(Collectors.groupingBy(SimEvent::portName, Collectors.counting()));
 
-    // Port1 repeats the frames of B (2: ARP reply, echo reply); Port2 those of A (2: ARP request,
-    // echo request); Port3 repeats frames from both sides.
+    // Port1 repeats the frames of B (3: ARP reply, two echo replies); Port2 those of A (3: ARP
+    // request, two echo requests); Port3 repeats frames from both sides.
     assertThat(repeats)
-        .containsEntry("Port1", 2L)
-        .containsEntry("Port2", 2L)
-        .containsEntry("Port3", 4L);
+        .containsEntry("Port1", 3L)
+        .containsEntry("Port2", 3L)
+        .containsEntry("Port3", 6L);
   }
 
   @Test
@@ -134,12 +159,14 @@ class HubScenarioTest {
             .filter(e -> e.deviceId().equals(c.id()) && e.action() == SimAction.DROP)
             .toList();
 
-    // ARP request, ARP reply, echo request, echo reply.
-    assertThat(received).hasSize(4);
+    // ARP request, ARP reply, then two echo requests and two echo replies.
+    assertThat(received).hasSize(6);
     assertThat(ignored)
         .extracting(SimEvent::explanationKey)
         .containsExactly(
             "sim.arp.notForMe",
+            "sim.nic.frameNotForMe",
+            "sim.nic.frameNotForMe",
             "sim.nic.frameNotForMe",
             "sim.nic.frameNotForMe",
             "sim.nic.frameNotForMe");

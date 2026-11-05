@@ -192,12 +192,12 @@ class SwitchLearningTest {
 
     PingResult result = new SimulationEngine(topology).ping(a.id(), Lab.ip("192.168.1.20"), 2);
 
-    assertThat(result.allReceived()).isFalse();
-    assertThat(result.attempts().get(1).success()).isTrue();
+    assertThat(result.allReceived()).isTrue();
+    // ARP request, ARP reply, then an echo request and reply for each of the two pings.
     assertThat(result.events())
         .filteredOn(e -> e.deviceId().equals(repeater.id()) && e.action() == SimAction.REPEAT)
         .extracting(SimEvent::portName)
-        .containsExactly("Port2", "Port1", "Port2", "Port1");
+        .containsExactly("Port2", "Port1", "Port2", "Port1", "Port2", "Port1");
   }
 
   @Test

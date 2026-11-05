@@ -348,8 +348,9 @@ final class Simulation {
    *
    * @param inbound the frame the packet arrived in if a router is forwarding it (its addresses are
    *     replaced), or {@code null} if this device created the packet
-   * @param dropWhileResolving whether to drop the packet when ARP is needed (hosts, by default)
-   *     instead of holding it (routers)
+   * @param dropWhileResolving whether to drop the packet when ARP is needed (Cisco IOS routers do,
+   *     which is why the first ping through a router is lost) instead of holding it until the reply
+   *     arrives (hosts always do)
    * @param ingress the port a forwarded packet came in on, or {@code null}
    */
   void sendIpv4(
@@ -390,7 +391,7 @@ final class Simulation {
           3,
           SimAction.DROP,
           packet,
-          ExplanationKey.ARP_FIRST_PACKET_LOST,
+          ExplanationKey.ROUTER_ARP_PACKET_DROPPED,
           packet.dst(),
           nextHop);
       fail(FailureReason.LOST_TO_ARP, device);
@@ -560,9 +561,9 @@ final class Simulation {
   }
 
   /**
-   * Called when nothing is in flight: every ARP request still unanswered has timed out. A host
-   * records that the next hop is unreachable; a router throws away the packets it held and tells
-   * their senders with an ICMP "host unreachable".
+   * Called when nothing is in flight: every ARP request still unanswered has timed out. The device
+   * throws away the packets it held, the ping records that the next hop is unreachable, and a
+   * router also tells the packets' senders with an ICMP "host unreachable".
    *
    * @return whether there were any, i.e. whether new events may have been scheduled
    */
@@ -590,20 +591,18 @@ final class Simulation {
         attempt.failure = null;
       }
       fail(FailureReason.HOST_UNREACHABLE, request.device);
-      if (request.device instanceof Router router) {
-        for (Held held : request.held) {
-          emit(
-              router,
-              request.out,
-              3,
-              SimAction.DROP,
-              held.packet(),
-              ExplanationKey.ARP_HELD_PACKET_DISCARDED,
-              held.packet().dst());
-          if (held.ingress() != null) {
-            RouterBehavior.sendError(
-                this, router, held.ingress(), held.packet(), IcmpType.DESTINATION_UNREACHABLE, 1);
-          }
+      for (Held held : request.held) {
+        emit(
+            request.device,
+            request.out,
+            3,
+            SimAction.DROP,
+            held.packet(),
+            ExplanationKey.ARP_HELD_PACKET_DISCARDED,
+            held.packet().dst());
+        if (request.device instanceof Router router && held.ingress() != null) {
+          RouterBehavior.sendError(
+              this, router, held.ingress(), held.packet(), IcmpType.DESTINATION_UNREACHABLE, 1);
         }
       }
     }

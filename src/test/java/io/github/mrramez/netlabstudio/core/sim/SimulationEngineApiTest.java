@@ -119,9 +119,12 @@ class SimulationEngineApiTest {
     lan.engine().clearArpTable(lan.a().id());
     assertThat(lan.engine().arpTable(lan.a().id())).isEmpty();
     assertThat(lan.engine().arpTable(lan.b().id())).hasSize(1);
-    // With the cache empty again, the next ping loses its first packet to ARP again.
+    // With the cache empty again, A has to ask again, but it holds its packet: no ping is lost.
     PingResult again = lan.engine().ping(lan.a().id(), Lab.ip("192.168.1.20"), 1);
-    assertThat(again.attempts().get(0).reason()).contains(FailureReason.LOST_TO_ARP);
+    assertThat(again.allReceived()).isTrue();
+    assertThat(again.events())
+        .extracting(SimEvent::explanationKey)
+        .contains("sim.arp.cacheMiss", "sim.arp.requestSent");
 
     lan.engine().resetState();
     assertThat(lan.engine().arpTable(lan.b().id())).isEmpty();
@@ -176,25 +179,6 @@ class SimulationEngineApiTest {
   // ---- behaviour that follows from the settings -----------------------------------------------
 
   @Test
-  void aHostThatHoldsTheFirstPacketDoesNotLoseIt() {
-    Lan lan = lan();
-    SimulationEngine engine =
-        new SimulationEngine(
-            topology, SimulationSettings.defaults().withHostDropsFirstPacketWhileArping(false));
-
-    PingResult result = engine.ping(lan.a().id(), Lab.ip("192.168.1.20"), 1);
-
-    assertThat(result.allReceived()).isTrue();
-    List<String> keys = result.events().stream().map(SimEvent::explanationKey).toList();
-    assertThat(keys)
-        .contains("sim.arp.packetHeld", "sim.arp.packetReleased")
-        .doesNotContain("sim.arp.firstPacketLost");
-    assertThat(result.events().get(0).time()).isZero();
-    // ARP (4 ticks) plus the echo (4 ticks) in one attempt.
-    assertThat(result.attempts().get(0).roundTripTicks()).isEqualTo(8);
-  }
-
-  @Test
   void theHostTtlIsConfigurable() {
     Lan lan = lan();
     SimulationEngine engine =
@@ -207,7 +191,7 @@ class SimulationEngineApiTest {
             .filter(e -> e.explanationKey().equals("sim.icmp.echoReplyReceived"))
             .findFirst()
             .orElseThrow();
-    assertThat(received.args()).containsExactly("192.168.1.20", 2, 64);
+    assertThat(received.args()).containsExactly("192.168.1.20", 1, 64);
   }
 
   @Test

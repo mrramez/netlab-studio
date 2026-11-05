@@ -206,7 +206,7 @@ class SimulationValueObjectsTest {
         .isEqualTo(5_000);
     assertThat(defaults.hostTtl()).isEqualTo(128);
     assertThat(defaults.routerTtl()).isEqualTo(255);
-    assertThat(defaults.hostDropsFirstPacketWhileArping()).isTrue();
+    assertThat(defaults.routerDropsFirstPacketWhileArping()).isTrue();
   }
 
   @Test
@@ -216,7 +216,7 @@ class SimulationValueObjectsTest {
         base.withMaxEvents(100)
             .withHostTtl(64)
             .withRouterTtl(250)
-            .withHostDropsFirstPacketWhileArping(false);
+            .withRouterDropsFirstPacketWhileArping(false);
 
     assertThat(changed).isEqualTo(new SimulationSettings(100, 64, 250, false));
     assertThat(base).isEqualTo(SimulationSettings.defaults());

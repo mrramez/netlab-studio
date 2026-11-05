@@ -152,7 +152,14 @@ final class RouterBehavior {
         packet.dst(),
         route.get().destination(),
         out.name());
-    sim.sendIpv4(router, out, packet.dst(), packet, null, false, null);
+    sim.sendIpv4(
+        router,
+        out,
+        packet.dst(),
+        packet,
+        null,
+        sim.settings().routerDropsFirstPacketWhileArping(),
+        null);
   }
 
   /** Forwards a transit packet: TTL, route lookup, new frame for the next hop. */
@@ -201,7 +208,14 @@ final class RouterBehavior {
         packet.dst(),
         route.get().destination(),
         out.name());
-    sim.sendIpv4(router, out, packet.dst(), decremented, frame, false, in);
+    sim.sendIpv4(
+        router,
+        out,
+        packet.dst(),
+        decremented,
+        frame,
+        sim.settings().routerDropsFirstPacketWhileArping(),
+        in);
   }
 
   /**

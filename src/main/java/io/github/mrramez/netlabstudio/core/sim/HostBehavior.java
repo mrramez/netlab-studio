@@ -148,8 +148,7 @@ final class HostBehavior {
       sim.fail(reasonOf(link.problem()), host);
       return;
     }
-    sim.sendIpv4(
-        host, nic, nextHop, packet, null, sim.settings().hostDropsFirstPacketWhileArping(), null);
+    sim.sendIpv4(host, nic, nextHop, packet, null, false, null);
   }
 
   /** A frame arrives at the NIC. */

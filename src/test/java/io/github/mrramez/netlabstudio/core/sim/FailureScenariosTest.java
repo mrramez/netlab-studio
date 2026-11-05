@@ -326,7 +326,7 @@ class FailureScenariosTest {
     SimulationEngine engine =
         new SimulationEngine(topology, SimulationSettings.defaults().withHostTtl(1));
 
-    assertThat(engine.ping(a.id(), Lab.ip("192.168.1.20"), 2).received()).isEqualTo(1);
+    assertThat(engine.ping(a.id(), Lab.ip("192.168.1.20"), 2).allReceived()).isTrue();
   }
 
   @Test
@@ -360,7 +360,7 @@ class FailureScenariosTest {
     assertThat(result.attempts())
         .allSatisfy(
             attempt -> {
-              // The first packet is lost to ARP, but "nobody answered" is the better explanation.
+              // The held packet is discarded when ARP times out: "nobody answered" is the cause.
               assertThat(attempt.reason()).contains(FailureReason.HOST_UNREACHABLE);
               assertThat(attempt.failedAtDeviceId()).isEqualTo(a.id());
             });
@@ -371,23 +371,51 @@ class FailureScenariosTest {
     assertThat(noReply.get(0).args()).containsExactly("192.168.1.99");
   }
 
-  @Test
-  void aRouterThatCannotFindTheHostSendsHostUnreachable() {
+  /** PC A - R1 - an empty LAN 2: nobody owns 192.168.2.50. ARP towards it is never answered. */
+  private PingResult pingAnAddressNobodyOwnsBehindARouter(SimulationSettings settings, Router[] r) {
     Host a = Lab.pc(topology, "A", "192.168.1.10", "192.168.1.1");
     Router r1 = topology.addRouter("R1");
     Switch lan2 = topology.addSwitch("LAN2");
     Lab.configure(r1, "G0/0", "192.168.1.1", "/24");
     Lab.configure(r1, "G0/1", "192.168.2.1", "/24");
     Lab.cable(topology, a, "Fa0", r1, "G0/0");
-    Lab.cable(topology, r1, "G0/1", lan2, "Fa0/1"); // nobody else on LAN 2
-    SimulationEngine engine = new SimulationEngine(topology);
-    engine.ping(a.id(), Lab.ip("192.168.1.1"), 1);
+    Lab.cable(topology, r1, "G0/1", lan2, "Fa0/1");
+    r[0] = r1;
+    SimulationEngine engine = new SimulationEngine(topology, settings);
+    engine.ping(a.id(), Lab.ip("192.168.1.1"), 1); // warm A's cache for its gateway
+    return engine.ping(a.id(), Lab.ip("192.168.2.50"), 1);
+  }
 
-    PingResult result = engine.ping(a.id(), Lab.ip("192.168.2.50"), 1);
+  @Test
+  void aRouterThatDropsThePacketLeavesTheSenderWithATimeout() {
+    Router[] router = new Router[1];
+
+    PingResult result = pingAnAddressNobodyOwnsBehindARouter(SimulationSettings.defaults(), router);
+
+    PingAttempt attempt = result.attempts().get(0);
+    // Cisco IOS dropped the packet that triggered ARP, so there is nothing to report back to A.
+    assertThat(attempt.reason()).contains(FailureReason.HOST_UNREACHABLE);
+    assertThat(attempt.failedAtDeviceId()).isEqualTo(router[0].id());
+    assertThat(attempt.repliedFrom()).isNull();
+    assertThat(find(result, "sim.router.arpPacketDropped")).isPresent();
+    assertThat(find(result, "sim.arp.noReply").orElseThrow().args())
+        .containsExactly("192.168.2.50");
+    assertThat(find(result, "sim.icmp.unreachableCreated")).isEmpty();
+    assertThat(result.events().get(result.events().size() - 1).explanationKey())
+        .isEqualTo("sim.ping.timeout");
+  }
+
+  @Test
+  void aRouterThatHoldsThePacketSendsHostUnreachableWhenArpFails() {
+    Router[] router = new Router[1];
+    SimulationSettings holding =
+        SimulationSettings.defaults().withRouterDropsFirstPacketWhileArping(false);
+
+    PingResult result = pingAnAddressNobodyOwnsBehindARouter(holding, router);
 
     PingAttempt attempt = result.attempts().get(0);
     assertThat(attempt.reason()).contains(FailureReason.HOST_UNREACHABLE);
-    assertThat(attempt.failedAtDeviceId()).isEqualTo(r1.id());
+    assertThat(attempt.failedAtDeviceId()).isEqualTo(router[0].id());
     assertThat(attempt.repliedFrom()).isEqualTo(Lab.ip("192.168.1.1"));
     assertThat(find(result, "sim.arp.packetHeld")).isPresent();
     assertThat(find(result, "sim.arp.heldPacketDiscarded").orElseThrow().args())
