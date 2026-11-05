@@ -1,5 +1,7 @@
 package io.github.mrramez.netlabstudio;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,8 +20,9 @@ class ArchitectureTest {
   private static final String ROOT = "io.github.mrramez.netlabstudio";
   private static final String CORE = ROOT + ".core..";
 
-  // allowEmptyShould: the core packages have no classes yet in the project skeleton.
-  // javaFxRuleRejectsAViolation and uiRuleRejectsAViolation prove the rules are not vacuous.
+  // The rules below are not vacuous: core.net has classes, and the *RejectsAViolation tests feed
+  // them code that breaks each rule. Rules for a package that is still empty (sim, cli, ...) must
+  // add allowEmptyShould(true) until it gets classes.
   static final ArchRule CORE_DOES_NOT_USE_JAVAFX =
       noClasses()
           .that()
@@ -27,8 +30,7 @@ class ArchitectureTest {
           .should()
           .dependOnClassesThat()
           .resideInAPackage("javafx..")
-          .because("core holds all logic and must be testable without a UI toolkit")
-          .allowEmptyShould(true);
+          .because("core holds all logic and must be testable without a UI toolkit");
 
   // A core class could otherwise reach JavaFX indirectly, through a ui or app class.
   static final ArchRule CORE_DOES_NOT_DEPEND_ON_UI_OR_APP =
@@ -38,8 +40,20 @@ class ArchitectureTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage(ROOT + ".ui..", ROOT + ".app..")
-          .because("dependencies point from ui and app to core, never back")
-          .allowEmptyShould(true);
+          .because("dependencies point from ui and app to core, never back");
+
+  private static final String CORE_NET = ROOT + ".core.net..";
+
+  /** Classes in {@code packageName} may depend only on the JDK and on that package itself. */
+  static ArchRule onlyJdkAndItself(String packageName) {
+    return classes()
+        .that()
+        .resideInAPackage(packageName)
+        .should()
+        .onlyDependOnClassesThat()
+        .resideInAnyPackage("java..", packageName)
+        .because("addressing arithmetic is pure Java and must not pull in any other code");
+  }
 
   private static final JavaClasses PRODUCTION_CLASSES =
       new ClassFileImporter()
@@ -72,6 +86,24 @@ class ArchitectureTest {
   @Test
   void uiRuleRejectsAViolation() {
     assertThat(CORE_DOES_NOT_DEPEND_ON_UI_OR_APP.evaluate(VIOLATING_FIXTURE).hasViolation())
+        .isTrue();
+  }
+
+  @Test
+  void coreNetDependsOnlyOnTheJdkAndItself() {
+    onlyJdkAndItself(CORE_NET).check(PRODUCTION_CLASSES);
+  }
+
+  @Test
+  void coreNetIsActuallyScanned() {
+    assertThat(PRODUCTION_CLASSES.containPackage(ROOT + ".core.net")).isTrue();
+    assertThat(PRODUCTION_CLASSES.that(resideInAPackage(CORE_NET))).isNotEmpty();
+  }
+
+  @Test
+  void jdkOnlyRuleRejectsAViolation() {
+    assertThat(
+            onlyJdkAndItself(ROOT + ".core.archfixture").evaluate(VIOLATING_FIXTURE).hasViolation())
         .isTrue();
   }
 }
